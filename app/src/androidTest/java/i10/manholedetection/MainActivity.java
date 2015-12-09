@@ -2,6 +2,7 @@ package i10.manholedetection;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.hardware.Camera;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -16,20 +17,19 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import i10.manholedetection.R;
 
 public class MainActivity extends AppCompatActivity {
 
+    //カメラプレビュークラス
+    private CameraPreviewActivity cameraPreviewActivity=null;
+
     private int[] pixcels;
     private int width, height;
     private static native void mainTest(int[] pixcels,int width, int height); //宣言
-    public MainActivity(int[] pixcels, int width, int height) {
-        this.pixcels = pixcels;
-        this.width = width;
-        this.height = height;
-    }
     /**
      * filter
      */
@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     {
         mainTest(this.pixcels, this.width, this.height);
     }
-private int a;
     //camera
     private Uri m_uri;
     private static final int REQUEST_CHOOSER = 1000;
@@ -105,16 +104,19 @@ private int a;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setViews();
+
+        Intent intent=new Intent();
+        intent.setClassName("i10.manholedetection", "i10.manholedetection.CameraPreviewActivity");
+        startActivity(intent);
     }
     private void setViews(){
-        Button button = (Button)findViewById(R.id.buttonPanel);
+        Button button = (Button)findViewById(R.id.button);
         button.setOnClickListener(button_onClick);
     }
     private View.OnClickListener button_onClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            showGallery();
         }
     };
+
 }
