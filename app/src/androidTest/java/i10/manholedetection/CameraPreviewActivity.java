@@ -1,16 +1,10 @@
 package i10.manholedetection;
 
 import android.app.Activity;
-import android.content.Context;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-
-import java.io.IOException;
 
 
 /**
@@ -22,6 +16,7 @@ public class CameraPreviewActivity extends Activity{
     int numberOfCameras;
     int defaultCameraId;
     int cameraCurrentlyLocked;
+
     Camera mCamera;
     @Override
     public void onCreate(Bundle savedInstanceState) {
