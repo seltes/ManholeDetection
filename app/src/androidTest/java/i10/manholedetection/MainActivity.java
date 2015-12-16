@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent();
-            intent.setClassName(MainActivity.this,Manifest.cameraPreviewActivity);
+            intent.setClassName(Manifest.androidPackage,Manifest.cameraPreviewActivity);
             startActivity(intent);
         }
     };

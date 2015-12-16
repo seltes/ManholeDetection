@@ -6,8 +6,8 @@ package i10.manholedetection;
 public class StringsFile {
     private StringsFile(){}
     public static class Manifest{
-        public static final String androidPackage = "i10.ManholeDetection";
-        public static final String cameraPreviewActivity = "i10.ManholeDetection.CameraPreviewActivity";
+        public static final String androidPackage = "i10.manholedetection";
+        public static final String cameraPreviewActivity = "i10.manholedetection.CameraPreviewActivity";
     }
 }
 

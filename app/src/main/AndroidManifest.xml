@@ -3,6 +3,8 @@
     package="i10.manholedetection" >
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
         android:allowBackup="true"
@@ -11,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="MainActivity"
+            android:name="i10.manholedetection.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
@@ -21,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="i10.manholedetection/i10.manholedetection.CameraPreviewActivity"
+            android:name="i10.manholedetection.CameraPreviewActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
         </activity>

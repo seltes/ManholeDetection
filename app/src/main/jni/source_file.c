@@ -6,7 +6,7 @@
 #include "jni.h"
 
 
-void Java_i10_manholedetection_MainActivity_mainTest(JNIEnv * env, jobject  obj,  jintArray src, jint width, jint height)
+void Java_i10_ManholeDetection_MainActivity_mainTest(JNIEnv * env, jobject  obj,  jintArray src, jint width, jint height)
 {
     int i, totalPixel;
     jint* arr  =(*env)->GetIntArrayElements(env,src,0);
