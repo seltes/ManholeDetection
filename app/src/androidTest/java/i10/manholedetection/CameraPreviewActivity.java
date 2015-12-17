@@ -17,6 +17,11 @@ public class CameraPreviewActivity extends Activity{
     int defaultCameraId;
     int cameraCurrentlyLocked;
 
+    //画面の縦横
+    int width,height;
+    //画素値
+    int pixcels[];
+
     Camera mCamera;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,17 +58,7 @@ public class CameraPreviewActivity extends Activity{
         mPreview.setCamera(mCamera);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
 
-        // カメラを停止する
-        if (mCamera != null) {
-            mPreview.setCamera(null);
-            mCamera.release();
-            mCamera = null;
-        }
-    }
 }
 
 

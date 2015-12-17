@@ -1,2 +1,2 @@
-include ':app', ':mylibrary'
+include ':mylibrary', ':app'
 include ':apiDemos'

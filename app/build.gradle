@@ -27,12 +27,6 @@ model {
                 proguardFiles += file('proguard-android.txt')
             }
         }
-//
-//    android.productFlavors {
-//        create("flavor1") {
-//            applicationId = "com.app"
-//        }
-//    }
 
     // Configures source set directory.
     android.sources {
@@ -46,7 +40,7 @@ model {
     }
 
     android.ndk{
-        moduleName="MainNative"
+        moduleName="filter"
     }
 }
 dependencies {
