@@ -53,7 +53,7 @@ public class CameraPreviewActivity extends Activity{
 
         // カメラを開く
         mCamera = Camera.open();
-        mCamera.setDisplayOrientation(90);
+//        mCamera.setDisplayOrientation(90);
         cameraCurrentlyLocked = defaultCameraId;
         mPreview.setCamera(mCamera);
     }

@@ -1,8 +1,0 @@
-//
-// Created by Yasu on 2015/12/18.
-//
-
-#ifndef MANHOLEDETECTION_FILTER_H
-#define MANHOLEDETECTION_FILTER_H
-
-#endif //MANHOLEDETECTION_FILTER_H
