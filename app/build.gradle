@@ -26,6 +26,9 @@ model {
                 minifyEnabled =false
                 proguardFiles += file('proguard-android.txt')
             }
+            debug {
+                debuggable=true
+            }
         }
 
     // Configures source set directory.

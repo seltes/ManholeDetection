@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.ImageView;
 
 /**
  * Created by i10yasunaga on 2015/12/09.
@@ -82,25 +83,28 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                         cPixels = new int[width*height];
 
                         //エンコードBitmap,画像処理部(C）
-                        ImgFilter imgFilter=new ImgFilter(cPixels,data,width,height);
-                        imgFilter.filter();
+//                        ImgFilter imgFilter=new ImgFilter(cPixels,data,width,height);
+//                        imgFilter.filter();
+                        //エンコードBitmap
+                        decodeYUV420SP(cPixels, data, width, height);  // 変換
 
-//                        decodeYUV420SP(cPixels, data, width, height);  // 変換
-//                        bmp.setPixels(cPixels, 0, width, 0, 0, width, height);  // 変換した画素からビットマップにセット
+                        bmp.setPixels(cPixels, 0, width, 0, 0, width, height);  // 変換した画素からビットマップにセット
 
                         //画像処理部（C）
-//                        int cWidth = bmp.getWidth();
-//                        int cHeight = bmp.getHeight();
-//                        int cPixels[] = new int[cWidth * cHeight];
-//                        bmp.getPixels(cPixels, 0, width, 0, 0, width, height);
+                        int cWidth = bmp.getWidth();
+                        int cHeight = bmp.getHeight();
+                        int cPixels[] = new int[cWidth * cHeight];
+                        bmp.getPixels(cPixels, 0, width, 0, 0, width, height);
 //                        ImgFilter imgFilter = new ImgFilter(cPixels, cWidth, cHeight);
 //                        imgFilter.filter();
 
                         Canvas canvas = mHolder.lockCanvas();
                         canvas.drawBitmap(cPixels, 0, width, 0, 0, width, height, false, null);
                         mHolder.unlockCanvasAndPost(canvas);
+
+
                     } catch (Exception e) {
-//                        mCamera.stopPreview(); // エラー
+                        e.printStackTrace(); // エラー
                     }
                 }
             };
@@ -142,39 +146,38 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 //Cライブラリの作成
 class ImgFilter {
     private int[] pixels;
-    private byte[] data;
     private int width, height;
 
-    private static native void filter(int[] pixels,byte[] data,int width, int height);
+    private static native void filter(int[] pixels,int width, int height);
 
-    public ImgFilter(int[] pixels,byte[] data,int w, int h) {
+    public ImgFilter(int[] pixels,int w, int h) {
         this.pixels = pixels;
-        this.data = data;
         this.width = w;
         this.height = h;
     }
 
     public void filter() {
-        filter(this.pixels,this.data, this.width, this.height);
+        filter(this.pixels,this.width, this.height);
     }
 }
 
-//class EncodeBitmap{
-//    private int[] cPixels;
+//Cライブラリの作成(Bitmap変換込)
+//class ImgFilter {
+//    private int[] pixels;
 //    private byte[] data;
 //    private int width, height;
 //
-//    private static native void encodeBitmap(int[] cPixels,byte[] data, int width, int height);
+//    private static native void filter(int[] pixels,byte[] data,int width, int height);
 //
-//    public EncodeBitmap(int[] cPixels,byte[] data,int w, int h) {
-//        this.cPixels = cPixels;
+//    public ImgFilter(int[] pixels,byte[] data,int w, int h) {
+//        this.pixels = pixels;
 //        this.data = data;
 //        this.width = w;
 //        this.height = h;
 //    }
 //
-//    public void encodeBitmap() {
-//        encodeBitmap(this.cPixels, this.data, this.width, this.height);
+//    public void filter() {
+//        filter(this.pixels, this.data, this.width, this.height);
 //    }
 //}
 
