@@ -17,11 +17,6 @@ public class CameraPreviewActivity extends Activity{
     int defaultCameraId;
     int cameraCurrentlyLocked;
 
-    //画面の縦横
-    int width,height;
-    //画素値
-    int pixcels[];
-
     Camera mCamera;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,20 +26,20 @@ public class CameraPreviewActivity extends Activity{
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         // プレビュー画面を作成
-        mPreview = new CameraPreview(this);
+        mPreview = new CameraPreview(this,this);
         setContentView(mPreview);
-
-        // カメラ数を取得
-        numberOfCameras = Camera.getNumberOfCameras();
-
-        // 複数カメラがあった場合に備えて、BACKカメラを指定
-        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-        for (int i = 0; i < numberOfCameras; i++) {
-            Camera.getCameraInfo(i, cameraInfo);
-            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                defaultCameraId = i;
-            }
-        }
+//
+//        // カメラ数を取得
+//        numberOfCameras = Camera.getNumberOfCameras();
+//
+//        // 複数カメラがあった場合に備えて、BACKカメラを指定
+//        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+//        for (int i = 0; i < numberOfCameras; i++) {
+//            Camera.getCameraInfo(i, cameraInfo);
+//            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+//                defaultCameraId = i;
+//            }
+//        }
     }
 
     @Override
@@ -52,10 +47,10 @@ public class CameraPreviewActivity extends Activity{
         super.onResume();
 
         // カメラを開く
-        mCamera = Camera.open();
+//        mCamera = Camera.open();
 //        mCamera.setDisplayOrientation(90);
-        cameraCurrentlyLocked = defaultCameraId;
-        mPreview.setCamera(mCamera);
+//        cameraCurrentlyLocked = defaultCameraId;
+//        mPreview.setCamera(mCamera);
     }
 
 
