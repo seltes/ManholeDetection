@@ -20,15 +20,16 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     Camera mCamera;
     Bitmap bmp;
     Activity activity;
-    int width = 480, height = 640;  // プレビューの画面サイズ
-    int[] cPixels;  // ARGB8888の画素の配列
+    int width = 640, height = 480;  // プレビューの画面サイズ
+    int[][] cPixels=new int[width][height];  // ARGB8888の画素の配列
     int[] mGrayResult; //グレースケール
     private byte[] mFrameBuffer;
 
     //画像処理　C言語
     static {
-        System.loadLibrary("filter");
+        System.loadLibrary("Filter");
     }
+    private static native void filter(int[] grayScale, byte[] data, int width, int height);
 
 
     public CameraPreview(Context context, Activity activity) {
@@ -83,60 +84,42 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             new Camera.PreviewCallback() {
                 public void onPreviewFrame(byte[] data, Camera camera) {
                     try {
-                        int[] pixel = mGrayResult;
-                        for (int i = 0; i < width * height; i++) {
-                            int gray = data[i] & 0xff;
-                            pixel[i] = 0xff000000 | gray << 16 | gray << 8 | gray;
-                        }
-                        ImgFilter imgFilter=new ImgFilter(mGrayResult,width,height);
+//                        int[] pixel = mGrayResult;
+//                        for (int i = 0; i < width * height; i++) {
+//                            int gray = data[i] & 0xff;
+//                            pixel[i] = 0xff000000 | gray << 16 | gray << 8 | gray;
+//                        }
+                        filter(mGrayResult, data, width, height);
                         bmp.setPixels(mGrayResult, 0, width, 0, 0, width, height);
 //                        bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);  // ARGB8888で空のビットマップ作成
 //                        cPixels = new int[width*height];
-
-                        //エンコードBitmap,画像処理部(C）
-//                        ImgFilter imgFilter=new ImgFilter(cPixels,data,width,height);
-//                        imgFilter.filter();
-                        //エンコードBitmap
-//                        decodeYUV420SP(cPixels, data, width, height);  // 変換
-//
-//                        bmp.setPixels(cPixels, 0, width, 0, 0, width, height);  // 変換した画素からビットマップにセット
-//
-//                        //画像処理部（C）
-//                        int cWidth = bmp.getWidth();
-//                        int cHeight = bmp.getHeight();
-//                        int cPixels[] = new int[cWidth * cHeight];
-//                        bmp.getPixels(cPixels, 0, width, 0, 0, width, height);
-////                        ImgFilter imgFilter = new ImgFilter(cPixels, cWidth, cHeight);
-////                        imgFilter.filter();
-
                         Canvas canvas = mHolder.lockCanvas();
                         canvas.drawBitmap(bmp, 0, 0, null);
                         mHolder.unlockCanvasAndPost(canvas);
                         mCamera.addCallbackBuffer(mFrameBuffer);
-
-
                     } catch (Exception e) {
                         e.printStackTrace(); // エラー
+                        mCamera.stopPreview();
                     }
                 }
             };
 }
 
-//Cライブラリの作成
-class ImgFilter {
-    private int width, height;
-    private int[] grayScale;
-
-    private static native void filter(int[] grayScale,int width, int height);
-
-    public ImgFilter(int[] grayScale,int w, int h) {
-        this.grayScale=grayScale;
-        this.width = w;
-        this.height = h;
-    }
-
-    public void filter() {
-        filter(this.grayScale,this.width, this.height);
-    }
-}
-
+////Cライブラリの作成
+//class ImgFilter {
+//    private int width, height;
+//    private int[] grayScale;
+//
+//    private static native void filter(int[] grayScale,int width, int height);
+//
+//    public ImgFilter(int[] grayScale,int w, int h) {
+//        this.grayScale=grayScale;
+//        this.width = w;
+//        this.height = h;
+//    }
+//
+//    public void filter() {
+//        filter(this.grayScale,this.width, this.height);
+//    }
+//}
+//
