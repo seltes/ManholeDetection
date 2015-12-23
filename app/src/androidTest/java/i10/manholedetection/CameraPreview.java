@@ -104,22 +104,3 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 }
             };
 }
-
-////Cライブラリの作成
-//class ImgFilter {
-//    private int width, height;
-//    private int[] grayScale;
-//
-//    private static native void filter(int[] grayScale,int width, int height);
-//
-//    public ImgFilter(int[] grayScale,int w, int h) {
-//        this.grayScale=grayScale;
-//        this.width = w;
-//        this.height = h;
-//    }
-//
-//    public void filter() {
-//        filter(this.grayScale,this.width, this.height);
-//    }
-//}
-//
