@@ -2,7 +2,6 @@ package i10.manholedetection;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -10,12 +9,8 @@ import android.widget.Button;
 
 import static i10.manholedetection.StringsFile.*;
 
-import i10.manholedetection.R;
-
 public class MainActivity extends AppCompatActivity {
 
-    //カメラプレビュークラス
-    private CameraPreviewActivity cameraPreviewActivity = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -25,15 +20,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setViews() {
-        Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(button_onClick);
+        Button camButton = (Button) findViewById(R.id.camButton);
+        Button picButton = (Button) findViewById(R.id.picButton);
+        camButton.setOnClickListener(camButton_Click);
+        picButton.setOnClickListener(picButton_Click);
     }
 
-    private View.OnClickListener button_onClick = new View.OnClickListener() {
+    private View.OnClickListener camButton_Click = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent();
             intent.setClassName(Manifest.androidPackage,Manifest.cameraPreviewActivity);
+            startActivity(intent);
+        }
+    };
+
+    private View.OnClickListener picButton_Click = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent();
+            intent.setClassName(Manifest.androidPackage,Manifest.showPictureActivity);
             startActivity(intent);
         }
     };

@@ -8,6 +8,7 @@ public class StringsFile {
     public static class Manifest{
         public static final String androidPackage = "i10.manholedetection";
         public static final String cameraPreviewActivity = "i10.manholedetection.CameraPreviewActivity";
+        public static final String showPictureActivity = "i10.manholedetection.ShowPictureActivity";
     }
 }
 

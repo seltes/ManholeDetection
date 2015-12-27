@@ -21,7 +21,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     Bitmap bmp;
     Activity activity;
     int width = 640, height = 480;  // プレビューの画面サイズ
-    int[][] cPixels=new int[width][height];  // ARGB8888の画素の配列
     int[] mGrayResult; //グレースケール
     private byte[] mFrameBuffer;
 

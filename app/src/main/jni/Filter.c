@@ -5,16 +5,25 @@
 #include "jni.h"
 #include <math.h>
 
-////
-//jstring
-//Java_i10_manholedetection_ImgFilter_filter(JNIEnv *env,jobject obj,jintArray grayScale,jint width,jint height) {
-//    int i,gray;
-//    jint *pixels = (*env)->GetIntArrayElements(env, grayScale, 0);
-//
-//    (*env)->ReleaseIntArrayElements(env, grayScale, pixels, 0);
-//}
 
-//
+jstring
+Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env,jobject obj,jintArray grayScale,jint width,jint height) {
+    int x,y,gray[width*height];
+
+    jint *pixels = (*env)->GetIntArrayElements(env,grayScale,0);
+
+
+    for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++) {
+            gray[x+y*width] = pixels[x + y * width] & 0xff;
+        }
+    }
+    Gaussian(pixels,gray,height,width);
+//    sobel(pixels,pixels,height,width,1);
+
+    (*env)->ReleaseIntArrayElements(env,grayScale,pixels,0);
+}
+
 jstring
 Java_i10_manholedetection_CameraPreview_filter(JNIEnv *env,jobject obj,jintArray grayScale,jbyteArray data,jint width,jint height) {
     int i,gray;
@@ -84,5 +93,36 @@ void sobel(jintArray *out,jintArray *in, int inHeight, int inWidth, int inChanne
         }
     }
 }
+
+void Gaussian(jintArray *out,jintArray *in,int inHeight, int inWidth){
+    int x,y;
+    int gx,gy;
+    int offset;
+    int pixel;
+    float result;
+    float weight[9] = {1/16, 2/16, 1/16,
+                      2/16, 4/16, 2/16,
+                      1/16, 2/16, 1/16};
+
+    for(y = 0;  y < (inHeight - 1); y++){
+        for(x = 0; x < (inWidth - 1); x++){
+            offset= x+y*inWidth;
+            for(gy = 0 ; gy < 3; gy++) {
+                for (gx = 0; gx < 3; gx++) {
+                    pixel = in[gx + gy*inWidth+offset];
+                    result = pixel * weight[gx+gy];
+                    if(result > 255){
+                        result = 0;
+                    } else if(result < 0){
+                        result = -result;
+                    }
+                    out[gx + gy*inWidth+offset] = 0xff000000 | (int)result << 16 | (int)result << 8 |(int)result;
+                }
+            }
+        }
+    }
+}
+
+
 
 
