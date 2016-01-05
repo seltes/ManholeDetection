@@ -34,6 +34,7 @@ public class ShowPictureActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.img_view);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         imgView = (ImageView) findViewById(R.id.image_view);
         // ギャラリー呼び出し

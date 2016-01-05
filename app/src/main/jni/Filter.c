@@ -8,19 +8,28 @@
 
 jstring
 Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env,jobject obj,jintArray grayScale,jint width,jint height) {
-    int x,y,gray[width*height];
+    int x, y;
+    int gray[width * height];
+    int gaus[width * height];
+    int edge[width * height];
+    int thre[width * height];
 
-    jint *pixels = (*env)->GetIntArrayElements(env,grayScale,0);
+    jint *pixels = (*env)->GetIntArrayElements(env, grayScale, 0);
 
+    int ntk;
 
     for (y = 0; y < height; y++) {
         for (x = 0; x < width; x++) {
-            gray[x+y*width] = pixels[x + y * width] & 0xff;
+            gray[x + y * width] = pixels[x + y * width] & 0xff;
         }
     }
-    Gaussian(pixels,gray,height,width);
-//    sobel(pixels,pixels,height,width,1);
+    Gaussian(gaus, gray, height, width);
+    Gaussian(gaus, gaus, height, width);
+    Sobel(edge, gaus, height, width, 2);
 
+
+    Threshold(thre,edge,height,width);
+    OutputResult(pixels,edge,height,width);
     (*env)->ReleaseIntArrayElements(env,grayScale,pixels,0);
 }
 
@@ -34,16 +43,15 @@ Java_i10_manholedetection_CameraPreview_filter(JNIEnv *env,jobject obj,jintArray
         pix[i] = datas[i] & 0xff;
 //        gray = datas[i] & 0xff;
 //        pixels[i] = 0xff000000 | gray << 16 | gray << 8 | gray;
- }
+    }
 
-    sobel(pixels,pix,height,width,1);
-
+    Sobel(pixels, pix, height, width, 1);
 
     (*env)->ReleaseByteArrayElements(env,data,datas,0);
     (*env)->ReleaseIntArrayElements(env, grayScale, pixels, 0);
 }
 
-void sobel(jintArray *out,jintArray *in, int inHeight, int inWidth, int inChannel){
+void Sobel(jint *out, jint *in, int inHeight, int inWidth, int inChannel){
     int i, j, k, l;
     int weightH[9] = {-1, 0, 1,
                       -2, 0, 2,
@@ -94,32 +102,49 @@ void sobel(jintArray *out,jintArray *in, int inHeight, int inWidth, int inChanne
     }
 }
 
-void Gaussian(jintArray *out,jintArray *in,int inHeight, int inWidth){
+void Gaussian(int out[],int in[],int inHeight, int inWidth){
     int x,y;
     int gx,gy;
     int offset;
     int pixel;
-    float result;
-    float weight[9] = {1/16, 2/16, 1/16,
-                      2/16, 4/16, 2/16,
-                      1/16, 2/16, 1/16};
+    int result;
+    int weight[9] = {1, 2, 1,
+                      2, 4, 2,
+                      1, 2, 1};
 
-    for(y = 0;  y < (inHeight - 1); y++){
-        for(x = 0; x < (inWidth - 1); x++){
+    for(y = 1;  y < (inHeight - 1); y++){
+        for(x = 1; x < (inWidth - 1); x++){
             offset= x+y*inWidth;
+            result = 0;
             for(gy = 0 ; gy < 3; gy++) {
                 for (gx = 0; gx < 3; gx++) {
-                    pixel = in[gx + gy*inWidth+offset];
-                    result = pixel * weight[gx+gy];
-                    if(result > 255){
-                        result = 0;
-                    } else if(result < 0){
-                        result = -result;
-                    }
-                    out[gx + gy*inWidth+offset] = 0xff000000 | (int)result << 16 | (int)result << 8 |(int)result;
+                    pixel = in[gx-1 + (gy-1)*inWidth+offset];
+                    result += pixel * weight[gx*gy];
                 }
             }
+            out[offset] = result/16;
         }
+    }
+}
+
+void Threshold(int out[],int in[],int height,int width){
+    int i,thr;
+    for (i = 0; i < width * height; i++) {
+        thr = in[i] & 0xff;
+        if(thr >150){
+            thr=255;
+        }
+        else{
+            thr = 0;
+        }
+        out[i]=thr;
+    }
+}
+
+void OutputResult(jint *out,int in[],int height,int width){
+    int i;
+    for(i = 0;i < width * height;i++){
+        out[i] = 0xff000000 | in[i] << 16 | in[i] << 8 | in[i];
     }
 }
 
