@@ -56,16 +56,6 @@ public class ShowPictureActivity extends Activity {
                 changeImg = Bitmap.createScaledBitmap(getImg,width,height,false);
                 //画像処理
                 changeImg.getPixels(pixels, 0, width, 0, 0, width, height);
-//                for (int y = 0; y < height; y++) {
-//                    for (int x = 0; x < width; x++) {
-//                        int idx = x + (y * width);
-//                        int red   = pixels[idx] & 0x00ff0000 >> 16;
-//                        int green = pixels[idx] & 0x0000ff00 >> 8;
-//                        int blue  = pixels[idx] & 0x000000ff;
-//                        int gray  = (red + green + blue) / 3;
-//                        pixels[idx] = Color.rgb(gray, gray, gray);
-//                    }
-//                }
                 filter(pixels,width,height);
                 // 選択した画像を表示
                 changeImg.setPixels(pixels,0,width,0,0,width,height);
