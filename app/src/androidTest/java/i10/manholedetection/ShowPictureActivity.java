@@ -5,26 +5,23 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.ImageView;
 
 import java.io.InputStream;
 
-/**
- * Created by Yasu on 2015/12/27.
- */
 public class ShowPictureActivity extends Activity {
     private static final int REQUEST_GALLERY = 0;
     private ImageView imgView;
     Bitmap changeImg;
-    int width=640,height=480;
-    int[] pixels= new  int[width*height];
+    int width = 640, height = 480;
+    int[] pixels = new int[width * height];
 
     //画像処理　C言語
     static {
         System.loadLibrary("Filter");
     }
+
     private static native void filter(int[] pixeldata, int width, int height);
 
     /**
@@ -51,17 +48,18 @@ public class ShowPictureActivity extends Activity {
             try {
                 InputStream in = getContentResolver().openInputStream(data.getData());
                 Bitmap getImg = BitmapFactory.decodeStream(in);
+                assert in != null;
                 in.close();
 
-                changeImg = Bitmap.createScaledBitmap(getImg,width,height,false);
+                changeImg = Bitmap.createScaledBitmap(getImg, width, height, false);
                 //画像処理
                 changeImg.getPixels(pixels, 0, width, 0, 0, width, height);
-                filter(pixels,width,height);
+                filter(pixels, width, height);
                 // 選択した画像を表示
-                changeImg.setPixels(pixels,0,width,0,0,width,height);
+                changeImg.setPixels(pixels, 0, width, 0, 0, width, height);
                 imgView.setImageBitmap(changeImg);
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
     }
