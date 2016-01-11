@@ -5,18 +5,22 @@
 #include "jni.h"
 #include <math.h>
 
+#define HIGH 255
+#define L_BASE 100
+
 int width, height, size;
 
 void Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env, jobject obj, jintArray grayScale,
                                                      jint inWidth, jint inHeight);
 void ExtractGray(int out[],jint *in);
+void ExtractGrayB(int out[],jbyte *in);
 void Gaussian(int out[],int in[]);
 void Sobel(int out[],int in[],int step);
-void ExtractRoad(int out[],int in[]);
 void Threshold(int out[],int in[],int threshold);
 void OutputResult(jint *out,int in[]);
 void EmphasisEdge(int out[],int in[]);
 void Label(int out[],int in[]);
+void LabelSet(int lab[], int x, int y, int label);
 
 
 void Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env, jobject obj, jintArray grayScale,
@@ -24,60 +28,94 @@ void Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env, jobject o
     width = inWidth;
     height = inHeight;
     size = width * height;
-    int road[size];
-    int gray[size];
-    int gaus[size];
-    int edge[size];
-    int emph[size];
-    int thre[size];
+    int i[size];
+    int j[size];
+    int k[size];
 
     jint *pixels = (*env)->GetIntArrayElements(env, grayScale, 0);
 
     //グレースケール化
-    ExtractGray(gray, pixels);
+    ExtractGray(i, pixels);
     //ガウシアンフィルタ
-    Gaussian(gaus, gray);
+    Gaussian(j, i);
     //エッジ抽出
-    Sobel(edge, gaus, 2);
+    Sobel(k, j, 2);
     //エッジ強調
-    EmphasisEdge(emph,edge);
+    EmphasisEdge(i,k);
 ////    //参考　岡山理科大　道路情景画像からの路面表示の抽出と認識
 ////    ExtractRoad(road, gaus);
     //二値化
-    Threshold(thre, emph,180);
+    Threshold(j, i,180);
+
+   Label(k,j);
+
+    //出力
+    OutputResult(pixels, k);
+    (*env)->ReleaseIntArrayElements(env, grayScale, pixels, 0);
+}
+
+jstring
+Java_i10_manholedetection_CameraPreview_filter(JNIEnv *env, jobject obj, jintArray grayScale,
+                                               jbyteArray data, jint inWidth, jint inHeight) {
+    width = inWidth;
+    height = inHeight;
+    size = width * height;
+    int i[size];
+    int j[size];
+    int k[size];
+
+    jbyte *datas = (*env)->GetByteArrayElements(env, data, 0);
+    jint *pixels = (*env)->GetIntArrayElements(env, grayScale, 0);
+
+    //グレースケール化
+    ExtractGrayB(i, datas);
+    //ガウシアンフィルタ
+    Gaussian(j, i);
+    //エッジ抽出
+    Sobel(k, j, 2);
+    //エッジ強調
+    EmphasisEdge(i,k);
+    //二値化
+    Threshold(j, i,180);
 
 //    Label(labe,thre);
 //
 //    Threshold(thre,labe,1,1);
 
     //出力
-    OutputResult(pixels, thre);
+    OutputResult(pixels, j);
     (*env)->ReleaseIntArrayElements(env, grayScale, pixels, 0);
-}
-
-jstring
-Java_i10_manholedetection_CameraPreview_filter(JNIEnv *env, jobject obj, jintArray grayScale,
-                                               jbyteArray data, jint width, jint height) {
-    int i, gray;
-    int pix[width * height];
-    jint *pixels = (*env)->GetIntArrayElements(env, grayScale, 0);
-    jbyte *datas = (*env)->GetByteArrayElements(env, data, 0);
-    for (i = 0; i < width * height; i++) {
-        pix[i] = datas[i] & 0xff;
-//        gray = datas[i] & 0xff;
-//        pixels[i] = 0xff000000 | gray << 16 | gray << 8 | gray;
-    }
-
-    Sobel(pixels, pix, 1);
-
     (*env)->ReleaseByteArrayElements(env, data, datas, 0);
-    (*env)->ReleaseIntArrayElements(env, grayScale, pixels, 0);
 }
 
 /**
  * グレースケールの生成
  */
 void ExtractGray(int out[], jint *in) {
+    int i;
+    double r,g,b;
+    int ymax=0,ymin=0;
+    for(i=0;i<size;i++){
+        r = 0.3 * (in[i] & 0x00ff0000 >> 16);
+        g = 0.59*(in[i] & 0x0000ff00 >> 8);
+        b = 0.11*(in[i] & 0x000000ff);
+        out[i] = (int)(r + g + b);
+        if(out[i]>ymax){
+            ymax=out[i];
+        }
+        if(out[i]<ymin){
+            ymin=out[i];
+        }
+    }
+    for(i=0;i<size;i++){
+        out[i]=255*(out[i]-ymin)/(ymax-ymin);
+    }
+//    for (i = 0; i < size; i++) {
+//        out[i] = in[i] & 0xff;
+//    }
+}
+
+void ExtractGrayB(int out[], jbyte *in) {
     int i;
     double r,g,b;
     int ymax=0,ymin=0;
@@ -156,7 +194,7 @@ void Sobel(int out[], int in[], int inChannel) {
 }
 
 void Threshold(int out[], int in[], int threshold) {
-    int i, thr, v;
+    int i, thr;
     for (i = 0; i < width * height; i++) {
         thr = in[i] >= threshold ? 255 : 0;
         out[i] = thr;
@@ -170,88 +208,6 @@ void OutputResult(jint *out, int in[]) {
     int i;
     for (i = 0; i < width * height; i++) {
         out[i] = 0xff000000 | in[i] << 16 | in[i] << 8 | in[i];
-    }
-}
-
-/**
- * 路面抽出
- */
-void ExtractRoad(int out[], int in[]) {
-    int x, y, i, gx, gy;
-    int offset;
-    int pixels[9];
-    int no[] = {4, 3, 2, 5, 0, 1, 6, 7, 8};
-    int flag;
-    int n;
-
-    //輪郭線抽出
-    for (y = 1; y < (height - 1); y++) {
-        for (x = 1; x < (width - 1); x++) {
-            offset = x + y * width;
-            i = 0;
-            for (gy = 0; gy < 3; gy++) {
-                for (gx = 0; gx < 3; gx++) {
-                    pixels[no[i]] = in[gx - 1 + (gy - 1) * width + offset];
-                    i++;
-                }
-            }
-            flag = 0;
-            for (i = 1; i <= 4; i++) {
-                if (pixels[i] <= pixels[0] & pixels[i + 4] <= pixels[0]) {
-                    flag++;
-                }
-            }
-            out[offset] = flag == 4 ? 1 : 0;
-        }
-    }
-//    for (y = 1; y < (height - 1); y++) {
-//        for (x = 1; x < (width - 1); x++) {
-//            offset = x + y * width;
-//            i = 0;
-//            for (gy = 0; gy < 3; gy++) {
-//                for (gx = 0; gx < 3; gx++) {
-//                    pixels[no[i]] = 1 - out[gx - 1 + (gy - 1) * width + offset];
-//                    i++;
-//                }
-//            }
-//            //8近傍連結
-//            for (i = 0; i <= 2; i++) {
-//                n += pixels[2 * i + 1] - pixels[2 * i + 1] * pixels[2 * i + 2] * pixels[2 * i + 3];
-//            }
-//            n += pixels[7] - pixels[7] * pixels[8] * pixels[1];
-//            if (n <= 1) {
-//                out[offset] = 0;
-//            }
-//        }
-//    }
-}
-
-void Label(int out[],int in[]) {
-    int x, y, i, gx, gy;
-    int offset;
-    int pixels[9];
-    int n;
-    int no[] = {4, 3, 2, 5, 0, 1, 6, 7, 8};
-    for (y = 1; y < (height - 1); y++) {
-        for (x = 1; x < (width - 1); x++) {
-            offset = x + y * width;
-            i = 0;
-            for (gy = 0; gy < 3; gy++) {
-                for (gx = 0; gx < 3; gx++) {
-                    pixels[no[i]] = 1 - in[gx - 1 + (gy - 1) * width + offset];
-                    i++;
-                }
-            }
-            //8近傍連結
-            for (i = 0; i <= 2; i++) {
-                n += pixels[2 * i + 1] -
-                     pixels[2 * i + 1] * pixels[2 * i + 2] * pixels[2 * i + 3];
-            }
-            n += pixels[7] - pixels[7] * pixels[8] * pixels[1];
-            if (n <= 1) {
-                out[offset] = 0;
-            }
-        }
     }
 }
 
@@ -328,6 +284,47 @@ void Gaussian(int out[],int in[]){
     }
 }
 
+void Label(int out[],int in[]) {
+    int x, y, label;
+    label = L_BASE;
+    for (y = 0; y < size; y++) {
+        out[y] = in[y];
+    }
+    for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++) {
+            if (out[x + y * width] == HIGH) {
+                if (label < HIGH) {
+                    LabelSet(out, x, y, label);
+                    label+=5;
+                }
+            }
+        }
+    }
+}
+
+void LabelSet(int image[], int xs, int ys, int label) {
+    int x, y, cnt, offset, gx, gy;
+    image[xs + width * ys] = label;
+    for (; ;) {
+        cnt = 0;
+        for (y = 1; y < height - 1; y++) {
+            for (x = 1; x < width - 1; x++) {
+                if (image[x + y * width] == label) {
+                    offset = x + y * width;
+                    for (gy = 0; gy < 3; gy++) {
+                        for (gx = 0; gx < 3; gx++) {
+                            if(image[gx - 1 + (gy - 1) * width + offset] == HIGH){
+                                image[gx - 1 + (gy - 1) * width + offset] = label;
+                                cnt++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (cnt == 0) break;
+    }
+}
 
 
 
