@@ -7,6 +7,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.io.InputStream;
 
@@ -14,15 +17,17 @@ public class ShowPictureActivity extends Activity {
     private static final int REQUEST_GALLERY = 0;
     private ImageView imgView;
     Bitmap changeImg;
+    private TextView text;
     int width = 640, height = 480;
     int[] pixels = new int[width * height];
+    int cnt = 0;
 
     //画像処理　C言語
     static {
         System.loadLibrary("Filter");
     }
 
-    private static native void filter(int[] pixeldata, int width, int height);
+    private static native void filter(int[] pixeldata, int width, int height,int cnt);
 
     /**
      * Called when the activity is first created.
@@ -32,7 +37,7 @@ public class ShowPictureActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.img_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
+        text = (TextView) findViewById(R.id.textView);
         imgView = (ImageView) findViewById(R.id.image_view);
         // ギャラリー呼び出し
         Intent intent = new Intent();
@@ -54,9 +59,10 @@ public class ShowPictureActivity extends Activity {
                 changeImg = Bitmap.createScaledBitmap(getImg, width, height, false);
                 //画像処理
                 changeImg.getPixels(pixels, 0, width, 0, 0, width, height);
-                filter(pixels, width, height);
+                filter(pixels, width, height, cnt);
                 // 選択した画像を表示
                 changeImg.setPixels(pixels, 0, width, 0, 0, width, height);
+                text.setText(String.valueOf(cnt));
                 imgView.setImageBitmap(changeImg);
             } catch (Exception e) {
                 e.printStackTrace();

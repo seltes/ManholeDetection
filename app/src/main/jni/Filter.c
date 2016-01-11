@@ -11,7 +11,7 @@
 int width, height, size;
 
 void Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env, jobject obj, jintArray grayScale,
-                                                     jint inWidth, jint inHeight);
+                                                     jint inWidth, jint inHeight,jint cnt);
 void ExtractGray(int out[],jint *in);
 void ExtractGrayB(int out[],jbyte *in);
 void Gaussian(int out[],int in[]);
@@ -19,18 +19,19 @@ void Sobel(int out[],int in[],int step);
 void Threshold(int out[],int in[],int threshold);
 void OutputResult(jint *out,int in[]);
 void EmphasisEdge(int out[],int in[]);
-void Label(int out[],int in[]);
+void Label(int out[],int in[],int cnt);
 void LabelSet(int lab[], int x, int y, int label);
 
 
 void Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env, jobject obj, jintArray grayScale,
-                                                             jint inWidth, jint inHeight) {
+                                                             jint inWidth, jint inHeight,jint cnt) {
     width = inWidth;
     height = inHeight;
     size = width * height;
     int i[size];
     int j[size];
     int k[size];
+    int result[size];
 
     jint *pixels = (*env)->GetIntArrayElements(env, grayScale, 0);
 
@@ -42,19 +43,17 @@ void Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env, jobject o
     Sobel(k, j, 2);
     //エッジ強調
     EmphasisEdge(i,k);
-////    //参考　岡山理科大　道路情景画像からの路面表示の抽出と認識
-////    ExtractRoad(road, gaus);
     //二値化
     Threshold(j, i,180);
-
-   Label(k,j);
+    //ラベリング
+    Label(result,j,cnt);
 
     //出力
-    OutputResult(pixels, k);
+    OutputResult(pixels, result);
     (*env)->ReleaseIntArrayElements(env, grayScale, pixels, 0);
 }
 
-jstring
+void
 Java_i10_manholedetection_CameraPreview_filter(JNIEnv *env, jobject obj, jintArray grayScale,
                                                jbyteArray data, jint inWidth, jint inHeight) {
     width = inWidth;
@@ -134,9 +133,6 @@ void ExtractGrayB(int out[], jbyte *in) {
     for(i=0;i<size;i++){
         out[i]=255*(out[i]-ymin)/(ymax-ymin);
     }
-//    for (i = 0; i < size; i++) {
-//        out[i] = in[i] & 0xff;
-//    }
 }
 
 void Sobel(int out[], int in[], int inChannel) {
@@ -147,7 +143,6 @@ void Sobel(int out[], int in[], int inChannel) {
     int weightV[9] = {-1, -2, -1,
                       0, 0, 0,
                       1, 2, 1};
-    int *imgTmp;
     int weightSize = 3;
 
     int start = -1;
@@ -201,15 +196,7 @@ void Threshold(int out[], int in[], int threshold) {
     }
 }
 
-/**
- * グレイスケール画像の作成
- */
-void OutputResult(jint *out, int in[]) {
-    int i;
-    for (i = 0; i < width * height; i++) {
-        out[i] = 0xff000000 | in[i] << 16 | in[i] << 8 | in[i];
-    }
-}
+
 
 void EmphasisEdge(int out[],int in[]){
 //    int emp[]={-2,-5,-2,
@@ -219,7 +206,7 @@ void EmphasisEdge(int out[],int in[]){
     int emp[]={-2,-3,-2,
                -3,32,-3,
                -2,-3,-2};
-    int sumEmp = 12;
+//    int sumEmp = 12;
     int x,y,offset,gy,gx,result,pixel;
     int weightSize = 3;
     int start = -1;
@@ -284,7 +271,7 @@ void Gaussian(int out[],int in[]){
     }
 }
 
-void Label(int out[],int in[]) {
+void Label(int out[],int in[],int cnt) {
     int x, y, label;
     label = L_BASE;
     for (y = 0; y < size; y++) {
@@ -295,11 +282,12 @@ void Label(int out[],int in[]) {
             if (out[x + y * width] == HIGH) {
                 if (label < HIGH) {
                     LabelSet(out, x, y, label);
-                    label+=5;
+                    label++;
                 }
             }
         }
     }
+    cnt = label - L_BASE;
 }
 
 void LabelSet(int image[], int xs, int ys, int label) {
@@ -326,5 +314,32 @@ void LabelSet(int image[], int xs, int ys, int label) {
     }
 }
 
-
+/**
+ * グレイスケール画像の作成
+ */
+void OutputResult(jint *out, int in[]) {
+    int i;
+//    for (i = 0; i < width * height; i++) {
+//        out[i] = 0xff000000 | in[i] << 16 | in[i] << 8 | in[i];
+//    }
+    for (i = 0; i < size; i++) {
+        if(in[i]%5==0) {
+            if ((in[i] / 5) % 3 == 0) {
+                out[i] = 0xffff0000;
+            }
+            else if ((in[i] / 5) % 3 == 1) {
+                out[i] = 0xff00ff00;
+            }
+            else if ((in[i] / 5) % 3 == 2) {
+                out[i] = 0xff0000ff;
+            }
+            else{
+                out[i] = 0xff000000;
+            }
+        }
+        else{
+            out[i] = 0xff000000;
+        }
+    }
+}
 
