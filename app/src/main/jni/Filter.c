@@ -16,7 +16,7 @@ void ExtractRoad(int out[],int in[]);
 void Threshold(int out[],int in[],int threshold);
 void OutputResult(jint *out,int in[]);
 void EmphasisEdge(int out[],int in[]);
-double  GausFunc(int x,int y,double sig);
+void Label(int out[],int in[]);
 
 
 void Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env, jobject obj, jintArray grayScale,
@@ -37,17 +37,21 @@ void Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env, jobject o
     ExtractGray(gray, pixels);
     //ガウシアンフィルタ
     Gaussian(gaus, gray);
-    //エッジ強調
-    EmphasisEdge(emph,gray);
     //エッジ抽出
-    Sobel(edge, emph, 2);
-//    //参考　岡山理科大　道路情景画像からの路面表示の抽出と認識
-//    ExtractRoad(road, gaus);
+    Sobel(edge, gaus, 2);
+    //エッジ強調
+    EmphasisEdge(emph,edge);
+////    //参考　岡山理科大　道路情景画像からの路面表示の抽出と認識
+////    ExtractRoad(road, gaus);
     //二値化
-    Threshold(thre, edge,200);
+    Threshold(thre, emph,180);
+
+//    Label(labe,thre);
+//
+//    Threshold(thre,labe,1,1);
 
     //出力
-    OutputResult(pixels, gaus);
+    OutputResult(pixels, thre);
     (*env)->ReleaseIntArrayElements(env, grayScale, pixels, 0);
 }
 
@@ -151,51 +155,8 @@ void Sobel(int out[], int in[], int inChannel) {
     }
 }
 
-//void Gaussian(int out[], int in[]) {
-//    int x, y, r;
-//    int gx, gy;
-//    int offset;
-//    int pixel;
-//    int result;
-//    int weightSize = 3;
-//    int start = -1;
-//    int end = start + weightSize;
-//    int sumWeight = 9;
-//    double sumKanel=0.0;
-//    int weight[9] = {1, 2, 1,
-//                     2, 4, 2,
-//                     1, 2, 1};
-//        for (y = 1; y < (height - 1); y++) {
-//            for (x = 1; x < (width - 1); x++) {
-//                offset = x + y * width;
-//                result = 0;
-//                sumKanel =0.0;
-//                for (gy = start; gy < end; gy++) {
-//                    for (gx = start; gx < end; gx++) {
-//                        pixel = in[gx - 1 + (gy - 1) * width + offset];
-//                        result += pixel;
-////                        result += pixel * weight[(gy - start) * weightSize + (gx - start)];
-////                        sumKanel += GausFunc(x,y,1.4);
-//                    }
-//                }
-//                result /= sumWeight;
-//                // 255を超えた値は255、0未満の値は絶対値
-//                if (result > 255) {
-//                    result = 255;
-//                } else if (result < 0) {
-//                    result = -result;
-//                }
-//                out[offset] = result;
-//            }
-//        }
-//}
-
-double GausFunc(int x,int y,double sig){
-    return ((1.0/2.0*M_PI*sig*sig)*exp(-((x^2+y^2)/2.0*sig*sig)));
-}
-
 void Threshold(int out[], int in[], int threshold) {
-    int i, thr;
+    int i, thr, v;
     for (i = 0; i < width * height; i++) {
         thr = in[i] >= threshold ? 255 : 0;
         out[i] = thr;
@@ -265,14 +226,44 @@ void ExtractRoad(int out[], int in[]) {
 //    }
 }
 
-void Label(int out[],int in[]){
-
+void Label(int out[],int in[]) {
+    int x, y, i, gx, gy;
+    int offset;
+    int pixels[9];
+    int n;
+    int no[] = {4, 3, 2, 5, 0, 1, 6, 7, 8};
+    for (y = 1; y < (height - 1); y++) {
+        for (x = 1; x < (width - 1); x++) {
+            offset = x + y * width;
+            i = 0;
+            for (gy = 0; gy < 3; gy++) {
+                for (gx = 0; gx < 3; gx++) {
+                    pixels[no[i]] = 1 - in[gx - 1 + (gy - 1) * width + offset];
+                    i++;
+                }
+            }
+            //8近傍連結
+            for (i = 0; i <= 2; i++) {
+                n += pixels[2 * i + 1] -
+                     pixels[2 * i + 1] * pixels[2 * i + 2] * pixels[2 * i + 3];
+            }
+            n += pixels[7] - pixels[7] * pixels[8] * pixels[1];
+            if (n <= 1) {
+                out[offset] = 0;
+            }
+        }
+    }
 }
 
 void EmphasisEdge(int out[],int in[]){
-    int emp[]={-2,-5,-2,
-               -5,32,-5,
-               -2,-5,-2};
+//    int emp[]={-2,-5,-2,
+//               -5,32,-5,
+//               -2,-5,-2};
+//    int sumEmp = 4;
+    int emp[]={-2,-3,-2,
+               -3,32,-3,
+               -2,-3,-2};
+    int sumEmp = 12;
     int x,y,offset,gy,gx,result,pixel;
     int weightSize = 3;
     int start = -1;
@@ -298,25 +289,34 @@ void EmphasisEdge(int out[],int in[]){
         }
     }
 }
+
 void Gaussian(int out[],int in[]){
     int weight[]={1,2,1,
-               2,8,2,
-               1,2,1};
-    int x,y,offset,gy,gx,result,pixel;
+                  2,4,2,
+                  1,2,1};
+    int sumWeight = 16;
     int weightSize = 3;
     int start = -1;
+//    int weight[] = {1, 4, 6, 4,1,
+//                    4,16,24,16,4,
+//                    6,24,36,24,6,
+//                    4,16,24,16,4,
+//                    1, 4, 6, 4,1};
+//    int sumWeight = 256;
+//    int weightSize = 5;
+//    int start = -2;
+    int x,y,offset,gy,gx,result,pixel;
     int end = start + weightSize;
-    for (y = 1; y < (height - 1); y++) {
-        for (x = 1; x < (width - 1); x++) {
+    for (y = 1; y < (height + start); y++) {
+        for (x = 1; x < (width + start); x++) {
             offset = x + y * width;
             result = 0;
             for (gy = start; gy < end; gy++) {
                 for (gx = start; gx < end; gx++) {
-                    pixel = (unsigned char)in[gx - 1 + (gy - 1) * width + offset];
-                    result += pixel * weight[(gy - start) * weightSize + (gx - start)]/16;
+                    pixel = (unsigned char)in[gx + start + (gy + start) * width + offset];
+                    result += pixel * weight[(gy - start) * weightSize + (gx - start)]/sumWeight;
                 }
             }
-            result/=16;
             // 255を超えた値は255、0未満の値は絶対値
             if (result > 255) {
                 result = 255;
