@@ -22,14 +22,21 @@ model {
         }
     }
     android.buildTypes {
-            release {
-                minifyEnabled =false
-                proguardFiles += file('proguard-android.txt')
-            }
-            debug {
-                debuggable=true
+        release {
+            minifyEnabled = false
+            proguardFiles += file('proguard-android.pro')
+        }
+        debug {
+            ndk.with {
+                debuggable = true
             }
         }
+    }
+
+    compileOptions.with {
+        sourceCompatibility=JavaVersion.VERSION_1_7
+        targetCompatibility=JavaVersion.VERSION_1_7
+    }
 
     // Configures source set directory.
     android.sources {
@@ -44,10 +51,85 @@ model {
 
     android.ndk{
         moduleName="Filter"
+        cppFlags += "-Werror"
+        cppFlags += "--debug"
+        cppFlags += "-frtti"
+        cppFlags += "-fexceptions"
+        cppFlags += "-I${file('/Users/Yasu/Documents/Opencvforandroid/OpenCV-3.0.0-android-sdk/sdk/native/jni/include')}".toString()
+        cppFlags += "-I${file('src/main/jni')}".toString()
+
+        ldLibs += ["android", "log", "stdc++", "dl", "z"]
+        stl = "gnustl_static"
+    }
+    android.productFlavors {
+        create("arm") {
+            ndk.with {
+                abiFilters += "armeabi"
+
+                File curDir = file('./')
+                curDir = file(curDir.absolutePath)
+                ldLibs += curDir.absolutePath + "/src/main/jniLibs/" + "armeabi" + "/libopencv_java3.so"
+            }
+        }
+        create("arm7") {
+            ndk.with {
+                abiFilters += "armeabi-v7a"
+
+                File curDir = file('./')
+                curDir = file(curDir.absolutePath)
+                ldLibs += curDir.absolutePath + "/src/main/jniLibs/" + "armeabi-v7a" + "/libopencv_java3.so"
+            }
+        }
+        create("arm8") {
+            ndk.with {
+                abiFilters += "arm64-v8a"
+
+                File curDir = file('./')
+                curDir = file(curDir.absolutePath)
+                ldLibs += curDir.absolutePath + "/src/main/jniLibs/" + "arm64-v8a" + "/libopencv_java3.so"
+            }
+        }
+        create("x86") {
+            ndk.with {
+                abiFilters += "x86"
+
+                File curDir = file('./')
+                curDir = file(curDir.absolutePath)
+                ldLibs += curDir.absolutePath + "/src/main/jniLibs/" + "x86" + "/libopencv_java3.so"
+            }
+        }
+        create("x86-64") {
+            ndk.with {
+                abiFilters += "x86_64"
+
+                File curDir = file('./')
+                curDir = file(curDir.absolutePath)
+                ldLibs += curDir.absolutePath + "/src/main/jniLibs/" + "x86-64" + "/libopencv_java3.so"
+            }
+        }
+        create("mips") {
+            ndk.with {
+                abiFilters += "mips"
+
+                File curDir = file('./')
+                curDir = file(curDir.absolutePath)
+                ldLibs += curDir.absolutePath + "/src/main/jniLibs/" + "mips" + "/libopencv_java3.so"
+            }
+        }
+        create("mips-64") {
+            ndk.with {
+                abiFilters += "mips64"
+
+                File curDir = file('./')
+                curDir = file(curDir.absolutePath)
+                ldLibs += curDir.absolutePath + "/src/main/jniLibs/" + "mips64" + "/libopencv_java3.so"
+            }
+        }
     }
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:design:22.2.1'
+    compile project(':openCVLibrary300')
 }

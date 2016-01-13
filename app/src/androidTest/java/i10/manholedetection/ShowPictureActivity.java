@@ -24,6 +24,7 @@ public class ShowPictureActivity extends Activity {
 
     //画像処理　C言語
     static {
+        System.loadLibrary("opencv_java3");
         System.loadLibrary("Filter");
     }
 
