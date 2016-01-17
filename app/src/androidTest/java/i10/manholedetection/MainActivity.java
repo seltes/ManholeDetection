@@ -22,8 +22,10 @@ public class MainActivity extends AppCompatActivity {
     private void setViews() {
         Button camButton = (Button) findViewById(R.id.camButton);
         Button picButton = (Button) findViewById(R.id.picButton);
+        Button cvButton = (Button) findViewById(R.id.cvButton);
         camButton.setOnClickListener(camButton_Click);
         picButton.setOnClickListener(picButton_Click);
+        cvButton.setOnClickListener(cvButton_Click);
     }
 
     private View.OnClickListener camButton_Click = new View.OnClickListener() {
@@ -40,6 +42,15 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             Intent intent = new Intent();
             intent.setClassName(Manifest.androidPackage,Manifest.showPictureActivity);
+            startActivity(intent);
+        }
+    };
+
+    private View.OnClickListener cvButton_Click = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent();
+            intent.setClassName(Manifest.androidPackage,Manifest.opencvCameraActivity);
             startActivity(intent);
         }
     };

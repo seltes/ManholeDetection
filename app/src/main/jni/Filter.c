@@ -41,12 +41,12 @@ void Java_i10_manholedetection_ShowPictureActivity_filter(JNIEnv *env, jobject o
     Gaussian(j, i);
     //エッジ抽出
     Sobel(k, j, 2);
-    //エッジ強調
-    EmphasisEdge(i,k);
+//    //エッジ強調
+//    EmphasisEdge(i,k);
     //二値化
-    Threshold(j, i,180);
-    //ラベリング
-    Label(result,j,cnt);
+    Threshold(result, k,30);
+//    //ラベリング
+//    Label(result,j,cnt);
 
     //出力
     OutputResult(pixels, result);
@@ -181,9 +181,9 @@ void Sobel(int out[], int in[], int inChannel) {
             } else if (dataTmpSum < 0) {
                 dataTmpSum = -dataTmpSum;
             }
-//            out[i * widthStep + j] = (int)dataTmpSum;
-            out[i * widthStep + j] =
-                    0xff000000 | (int) dataTmpSum << 16 | (int) dataTmpSum << 8 | (int) dataTmpSum;
+            out[i * widthStep + j] = (int)dataTmpSum;
+//            out[i * widthStep + j] =
+//                    0xff000000 | (int) dataTmpSum << 16 | (int) dataTmpSum << 8 | (int) dataTmpSum;
         }
     }
 }
@@ -319,27 +319,8 @@ void LabelSet(int image[], int xs, int ys, int label) {
  */
 void OutputResult(jint *out, int in[]) {
     int i;
-//    for (i = 0; i < width * height; i++) {
-//        out[i] = 0xff000000 | in[i] << 16 | in[i] << 8 | in[i];
-//    }
-    for (i = 0; i < size; i++) {
-        if(in[i]%5==0) {
-            if ((in[i] / 5) % 3 == 0) {
-                out[i] = 0xffff0000;
-            }
-            else if ((in[i] / 5) % 3 == 1) {
-                out[i] = 0xff00ff00;
-            }
-            else if ((in[i] / 5) % 3 == 2) {
-                out[i] = 0xff0000ff;
-            }
-            else{
-                out[i] = 0xff000000;
-            }
-        }
-        else{
-            out[i] = 0xff000000;
-        }
+    for (i = 0; i < width * height; i++) {
+        out[i] = 0xff000000 | in[i] << 16 | in[i] << 8 | in[i];
     }
 }
 

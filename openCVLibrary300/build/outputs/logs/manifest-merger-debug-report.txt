@@ -1,0 +1,22 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml:2:1-8:12
+	xmlns:android
+		ADDED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml:2:11-69
+	package
+		ADDED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml:3:7-27
+	android:versionName
+		ADDED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml:5:7-34
+	android:versionCode
+		ADDED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml:4:7-33
+		INJECTED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml
+uses-sdk
+ADDED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml:7:5-43
+	android:targetSdkVersion
+		INJECTED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		ADDED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml:7:15-40
+		INJECTED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Yasu\Documents\AndroidProject\ManholeDetection\openCVLibrary300\src\main\AndroidManifest.xml

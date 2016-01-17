@@ -30,6 +30,10 @@
             android:name="i10.manholedetection.ShowPictureActivity"
             android:label="@string/app_name">
         </activity>
+        <activity
+            android:name="i10.manholedetection.OpencvCameraActivity"
+            android:label="@string/app_name">
+        </activity>
     </application>
 
 </manifest>
