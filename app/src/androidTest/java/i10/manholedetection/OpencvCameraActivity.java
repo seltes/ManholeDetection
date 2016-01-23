@@ -90,7 +90,7 @@ public class OpencvCameraActivity extends Activity implements CameraBridgeViewBa
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        detectManhole=new DetectManhole(inputFrame.gray());
-        return detectManhole.img;
+        detectManhole=new DetectManhole(inputFrame.gray(),inputFrame.rgba());
+        return detectManhole.origin;
     }
 }

@@ -20,7 +20,10 @@ public class ShowPictureActivity extends Activity {
     private static final int REQUEST_GALLERY = 0;
     private ImageView imgView;
     Bitmap changeImg;
+    //処理結果
     Mat cvImg;
+    //元画像
+    Mat originImg;
     DetectManhole detectManhole;
     private TextView text;
     int width = 640, height = 480;
@@ -46,6 +49,7 @@ public class ShowPictureActivity extends Activity {
         text = (TextView) findViewById(R.id.textView);
         imgView = (ImageView) findViewById(R.id.image_view);
         cvImg = new Mat(height,width, CvType.CV_8U);
+        originImg = new Mat(height,width, CvType.CV_8U);
         // ギャラリー呼び出し
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -63,6 +67,7 @@ public class ShowPictureActivity extends Activity {
                 assert in != null;
                 in.close();
                 changeImg = Bitmap.createScaledBitmap(getImg, width, height, false);
+                Utils.bitmapToMat(changeImg,originImg);
                 //画像処理
                 changeImg.getPixels(pixels, 0, width, 0, 0, width, height);
                 filter(pixels, width, height, cnt);
@@ -72,9 +77,9 @@ public class ShowPictureActivity extends Activity {
 //                openCVでの処理
                 Utils.bitmapToMat(changeImg, cvImg);
                 Imgproc.cvtColor(cvImg,cvImg,Imgproc.COLOR_RGB2GRAY);
-                detectManhole=new DetectManhole(cvImg);
-                changeImg = Bitmap.createBitmap(detectManhole.img.cols(), detectManhole.img.rows(), Bitmap.Config.ARGB_8888);
-                Utils.matToBitmap(detectManhole.img,changeImg);
+                detectManhole=new DetectManhole(cvImg,originImg);
+                changeImg = Bitmap.createBitmap(detectManhole.origin.cols(), detectManhole.origin.rows(), Bitmap.Config.ARGB_8888);
+                Utils.matToBitmap(detectManhole.origin,changeImg);
                 imgView.setImageBitmap(changeImg);
             } catch (Exception e) {
                 e.printStackTrace();
