@@ -1,6 +1,8 @@
 package i10.manholedetection;
 
 import android.app.Activity;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -10,6 +12,8 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
@@ -50,6 +54,7 @@ public class OpencvCameraActivity extends Activity implements CameraBridgeViewBa
         // カメラビューのインスタンスを変数にバインド
         mCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
         // リスナーの設定 (後述)
+
         mCameraView.setCvCameraViewListener(this);
     }
 
@@ -91,6 +96,14 @@ public class OpencvCameraActivity extends Activity implements CameraBridgeViewBa
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         detectManhole=new DetectManhole(inputFrame.gray(),inputFrame.rgba());
-        return detectManhole.origin;
+        Configuration conf = getResources().getConfiguration();
+        if(conf.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Point center = new Point(detectManhole.origin.cols() / 2, detectManhole.origin.rows() / 2);
+            Mat matrix = Imgproc.getRotationMatrix2D(center, -90, 1);
+            Mat rotatedImg = new Mat();
+            Imgproc.warpAffine(detectManhole.origin, rotatedImg, matrix, detectManhole.origin.size());
+            return rotatedImg;
+        }
+        else return detectManhole.origin;
     }
 }

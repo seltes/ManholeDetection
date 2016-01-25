@@ -42,7 +42,8 @@ public class DetectManhole {
         MatOfPoint2f point2f = null;
         Imgproc.Canny(img, img, 30, 150);
         Imgproc.dilate(img,img,new Mat());
-        ellipseDetect();
+//        ellipseDetect();
+        origin = img;
     }
 
 
@@ -62,7 +63,8 @@ public class DetectManhole {
         int i = 0;
         for (i = 0; i < contours.size(); i++) {
             Size count = contours.get(i).size();
-            if (count.height < 100 || count.height > 200) {
+            Log.d(TAG,count.toString());
+            if (count.height < 95 || count.height > 130) {
                 continue;
             }
             MatOfPoint ptmat = contours.get(i);

@@ -5,3 +5,5 @@
 .DS_Store
 /build
 /captures
+/openCVLibrary300
+/app/src/main/jniLibs
