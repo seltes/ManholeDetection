@@ -27,7 +27,8 @@ public class DetectManhole {
     public Mat img;
     public Mat origin;
     private String TAG = "DetectManhole";
-    public DetectManhole(Mat inputImg,Mat origin){
+
+    public DetectManhole(Mat inputImg, Mat origin) {
         this.img = inputImg;
         this.origin = origin;
         Detection();
@@ -41,9 +42,9 @@ public class DetectManhole {
         MatOfPoint point;
         MatOfPoint2f point2f = null;
         Imgproc.Canny(img, img, 30, 150);
-        Imgproc.dilate(img,img,new Mat());
-//        ellipseDetect();
-        origin = img;
+        Imgproc.dilate(img, img, new Mat());
+        ellipseDetect();
+//        origin = img;
     }
 
 
@@ -63,17 +64,20 @@ public class DetectManhole {
         int i = 0;
         for (i = 0; i < contours.size(); i++) {
             Size count = contours.get(i).size();
-            Log.d(TAG,count.toString());
-            if (count.height < 95 || count.height > 130) {
+            if (count.height < 80 || count.height > 400) {
                 continue;
             }
             MatOfPoint ptmat = contours.get(i);
             color = new Scalar(255, 0, 0);
             MatOfPoint2f ptmat2 = new MatOfPoint2f(ptmat.toArray());
             RotatedRect rot = Imgproc.fitEllipse(ptmat2);
-            Imgproc.circle(origin, rot.center, 5, color, -1);
-            color = new Scalar(0, 255, 0);
-            Imgproc.ellipse(origin, rot, color, 2);
+            Size size = rot.boundingRect().size();
+            Log.d(TAG, String.valueOf(rot.boundingRect()));
+            if(size.height-size.width>100) {
+                Imgproc.circle(origin, rot.center, 5, color, -1);
+                color = new Scalar(0, 255, 0);
+                Imgproc.ellipse(origin, rot, color, 2);
+            }
         }
     }
 }
