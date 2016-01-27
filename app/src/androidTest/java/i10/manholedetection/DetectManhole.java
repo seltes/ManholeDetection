@@ -73,7 +73,7 @@ public class DetectManhole {
             RotatedRect rot = Imgproc.fitEllipse(ptmat2);
             Size size = rot.boundingRect().size();
             Log.d(TAG, String.valueOf(rot.boundingRect()));
-            if(size.height-size.width>100) {
+            if(size.height-size.width>100&&size.height-size.width<200) {
                 Imgproc.circle(origin, rot.center, 5, color, -1);
                 color = new Scalar(0, 255, 0);
                 Imgproc.ellipse(origin, rot, color, 2);
