@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
@@ -25,11 +24,7 @@ public class ShowPictureActivity extends Activity {
     //元画像
     Mat originImg;
     DetectManhole detectManhole;
-    DetectWhiteLine detectWhiteLine;
-    private TextView text;
     int width = 640, height = 480;
-    int[] pixels = new int[width * height];
-    int cnt = 0;
 
     //画像処理　C言語
     static {
@@ -37,7 +32,7 @@ public class ShowPictureActivity extends Activity {
         System.loadLibrary("Filter");
     }
 
-    private static native void filter(int[] pixeldata, int width, int height,int cnt);
+//    private static native void filter(int[] pixeldata, int width, int height,int cnt);
 
     /**
      * Called when the activity is first created.
@@ -47,7 +42,6 @@ public class ShowPictureActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.img_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        text = (TextView) findViewById(R.id.textView);
         imgView = (ImageView) findViewById(R.id.image_view);
         cvImg = new Mat(height,width, CvType.CV_8U);
         originImg = new Mat(height,width, CvType.CV_8U);
@@ -60,7 +54,6 @@ public class ShowPictureActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO Auto-generated method stub
         if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
             try {
                 InputStream in = getContentResolver().openInputStream(data.getData());
@@ -77,10 +70,6 @@ public class ShowPictureActivity extends Activity {
                 //openCVで用いるMat形式に変換
                 Utils.bitmapToMat(changeImg, cvImg);
                 Imgproc.cvtColor(cvImg, cvImg, Imgproc.COLOR_RGB2GRAY);
-                //白線処理
-//                detectWhiteLine = new DetectWhiteLine(cvImg,originImg);
-//                changeImg = Bitmap.createBitmap(detectWhiteLine.origin.cols(), detectWhiteLine.origin.rows(), Bitmap.Config.ARGB_8888);
-//                Utils.matToBitmap(detectWhiteLine.origin,changeImg);
                 //マンホール処理
                 detectManhole=new DetectManhole(cvImg,originImg);
                 changeImg = Bitmap.createBitmap(detectManhole.origin.cols(), detectManhole.origin.rows(), Bitmap.Config.ARGB_8888);

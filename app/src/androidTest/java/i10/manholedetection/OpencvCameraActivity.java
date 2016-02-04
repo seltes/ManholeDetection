@@ -24,6 +24,7 @@ public class OpencvCameraActivity extends Activity implements CameraBridgeViewBa
     private CameraBridgeViewBase mCameraView;
     private Mat mOutputFrame;
     private DetectManhole detectManhole;
+    int width = 640, height = 480;
 
     //ライブラリをロード
     static {
@@ -100,7 +101,7 @@ public class OpencvCameraActivity extends Activity implements CameraBridgeViewBa
             Point center = new Point(detectManhole.origin.cols() / 2, detectManhole.origin.rows() / 2);
             Mat matrix = Imgproc.getRotationMatrix2D(center, -90, 1);
             Mat rotatedImg = new Mat();
-            Imgproc.warpAffine(detectManhole.origin, rotatedImg, matrix, detectManhole.origin.size());
+            Imgproc.warpAffine(detectManhole.origin, rotatedImg, matrix, new Size());
             return rotatedImg;
         }
         else return detectManhole.origin;
