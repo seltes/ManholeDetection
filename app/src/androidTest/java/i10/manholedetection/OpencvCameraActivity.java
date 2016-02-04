@@ -54,7 +54,6 @@ public class OpencvCameraActivity extends Activity implements CameraBridgeViewBa
         // カメラビューのインスタンスを変数にバインド
         mCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
         // リスナーの設定 (後述)
-
         mCameraView.setCvCameraViewListener(this);
     }
 

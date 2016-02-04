@@ -13,6 +13,7 @@ import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.ml.StatModel;
 import org.opencv.utils.Converters;
 
 import java.util.ArrayList;
@@ -41,10 +42,12 @@ public class DetectManhole {
         List<MatOfPoint2f> pointsf;
         MatOfPoint point;
         MatOfPoint2f point2f = null;
-        Imgproc.Canny(img, img, 30, 150);
+//      Cannyフィルタ
+        Imgproc.Canny(img, img, 10, 60);
+//      膨張
         Imgproc.dilate(img, img, new Mat());
         ellipseDetect();
-//        origin = img;
+////       origin = img;
     }
 
 
@@ -72,12 +75,24 @@ public class DetectManhole {
             MatOfPoint2f ptmat2 = new MatOfPoint2f(ptmat.toArray());
             RotatedRect rot = Imgproc.fitEllipse(ptmat2);
             Size size = rot.boundingRect().size();
-            Log.d(TAG, String.valueOf(rot.boundingRect()));
-            if(size.height-size.width>100&&size.height-size.width<200) {
+            if(checkEllipse(size,rot)){
                 Imgproc.circle(origin, rot.center, 5, color, -1);
                 color = new Scalar(0, 255, 0);
                 Imgproc.ellipse(origin, rot, color, 2);
             }
         }
     }
+
+    boolean checkEllipse(Size size,RotatedRect rot){
+        int thre1 = (((int)rot.center.x /50) -6)*1000;
+        int thre2 = (((int)rot.center.x / 50) - 6) * 5000;
+        Log.d(TAG, "area=" + String.valueOf(size.area()) +
+                   "\ncenter=" + String.valueOf(rot.center)  +
+                   "\nthre" + String.valueOf(thre1) + String.valueOf(thre2) +
+                   "\nxy" + String.valueOf(size.width) + " " + String.valueOf(size.height) +
+                   "\nangle" + String.valueOf(rot.angle));
+//        return (size.height - size.width>100 && size.height - size.width<200 && size.area()<20000);
+        return ((rot.angle <= 10 || (rot.angle <=180 && rot.angle >=170)) && size.height>size.width);
+    }
 }
+

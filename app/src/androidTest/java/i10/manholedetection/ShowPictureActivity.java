@@ -25,6 +25,7 @@ public class ShowPictureActivity extends Activity {
     //元画像
     Mat originImg;
     DetectManhole detectManhole;
+    DetectWhiteLine detectWhiteLine;
     private TextView text;
     int width = 640, height = 480;
     int[] pixels = new int[width * height];
@@ -68,18 +69,23 @@ public class ShowPictureActivity extends Activity {
                 in.close();
                 changeImg = Bitmap.createScaledBitmap(getImg, width, height, false);
                 Utils.bitmapToMat(changeImg,originImg);
-                //画像処理
-                changeImg.getPixels(pixels, 0, width, 0, 0, width, height);
-                filter(pixels, width, height, cnt);
-                // 選択した画像を表示
-                changeImg.setPixels(pixels, 0, width, 0, 0, width, height);
+                //C言語での処理
+//                changeImg.getPixels(pixels, 0, width, 0, 0, width, height);
+//                filter(pixels, width, height, cnt);
+//                changeImg.setPixels(pixels, 0, width, 0, 0, width, height);
 //                text.setText(String.valueOf(cnt));
-//                openCVでの処理
+                //openCVで用いるMat形式に変換
                 Utils.bitmapToMat(changeImg, cvImg);
-                Imgproc.cvtColor(cvImg,cvImg,Imgproc.COLOR_RGB2GRAY);
+                Imgproc.cvtColor(cvImg, cvImg, Imgproc.COLOR_RGB2GRAY);
+                //白線処理
+//                detectWhiteLine = new DetectWhiteLine(cvImg,originImg);
+//                changeImg = Bitmap.createBitmap(detectWhiteLine.origin.cols(), detectWhiteLine.origin.rows(), Bitmap.Config.ARGB_8888);
+//                Utils.matToBitmap(detectWhiteLine.origin,changeImg);
+                //マンホール処理
                 detectManhole=new DetectManhole(cvImg,originImg);
                 changeImg = Bitmap.createBitmap(detectManhole.origin.cols(), detectManhole.origin.rows(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(detectManhole.origin,changeImg);
+                //画像出力
                 imgView.setImageBitmap(changeImg);
             } catch (Exception e) {
                 e.printStackTrace();
