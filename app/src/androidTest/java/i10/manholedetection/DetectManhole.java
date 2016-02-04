@@ -47,7 +47,7 @@ public class DetectManhole {
 //      膨張
         Imgproc.dilate(img, img, new Mat());
         ellipseDetect();
-////       origin = img;
+//       origin = img;
     }
 
 
