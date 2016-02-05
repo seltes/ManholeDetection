@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: C:\\Users\\Yasu\\Documents\\AndroidProject\\ManholeDetection\\openCVLibrary300\\src\\main\\aidl\\org\\opencv\\engine\\OpenCVEngineInterface.aidl
+ * Original file: C:\\Users\\i10yasunaga\\AndroidStudioProjects\\ManholeDetection\\openCVLibrary300\\src\\main\\aidl\\org\\opencv\\engine\\OpenCVEngineInterface.aidl
  */
 package org.opencv.engine;
 /**

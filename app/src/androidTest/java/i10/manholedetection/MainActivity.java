@@ -23,9 +23,13 @@ public class MainActivity extends AppCompatActivity {
         Button camButton = (Button) findViewById(R.id.camButton);
         Button picButton = (Button) findViewById(R.id.picButton);
         Button cvButton = (Button) findViewById(R.id.cvButton);
+        Button edgeButton = (Button) findViewById(R.id.edgeButton);
+        Button ellipseButton = (Button) findViewById(R.id.ellipseButton);
         camButton.setOnClickListener(camButton_Click);
         picButton.setOnClickListener(picButton_Click);
         cvButton.setOnClickListener(cvButton_Click);
+        edgeButton.setOnClickListener(edgeButton_Click);
+        ellipseButton.setOnClickListener(ellipseButton_Click);
     }
 
     private View.OnClickListener camButton_Click = new View.OnClickListener() {
@@ -49,8 +53,26 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener cvButton_Click = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClassName(Manifest.androidPackage,Manifest.opencvCameraActivity);
+                startActivity(intent);
+        }
+    };
+
+    private View.OnClickListener edgeButton_Click = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
             Intent intent = new Intent();
-            intent.setClassName(Manifest.androidPackage,Manifest.opencvCameraActivity);
+            intent.setClassName(Manifest.androidPackage,Manifest.edgeCamActivity);
+            startActivity(intent);
+        }
+    };
+
+    private View.OnClickListener ellipseButton_Click = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent();
+            intent.setClassName(Manifest.androidPackage,Manifest.ellipseActivity);
             startActivity(intent);
         }
     };

@@ -27,26 +27,33 @@ import static org.opencv.imgproc.Imgproc.fitEllipse;
 public class DetectManhole {
     public Mat img;
     public Mat origin;
+    public int mode;
     private String TAG = "DetectManhole";
 
-    public DetectManhole(Mat inputImg, Mat origin) {
+    public DetectManhole(Mat inputImg, Mat origin,int mode) {
         this.img = inputImg;
         this.origin = origin;
+        this.mode = mode;
         Detection();
     }
 
     private void Detection() {
-        Mat dec = new Mat();
-        int i;
-        List<MatOfPoint> con = new ArrayList<MatOfPoint>(100);
-        List<MatOfPoint2f> pointsf;
-        MatOfPoint point;
-        MatOfPoint2f point2f = null;
+        if(mode >0) {
 //      Cannyフィルタ
-        Imgproc.Canny(img, img, 10, 60);
+            Imgproc.Canny(img, img, 10, 60);
 //      膨張
-        Imgproc.dilate(img, img, new Mat());
-        ellipseDetect();
+            Imgproc.dilate(img, img, new Mat());
+            if(mode <2){
+                origin =img;
+            }
+            ellipseDetect();
+        }
+        else{
+//      Cannyフィルタ
+            Imgproc.Canny(img, img, 10, 60);
+//      膨張
+            Imgproc.dilate(img, origin, new Mat());
+        }
 //       origin = img;
     }
 
@@ -75,10 +82,18 @@ public class DetectManhole {
             MatOfPoint2f ptmat2 = new MatOfPoint2f(ptmat.toArray());
             RotatedRect rot = Imgproc.fitEllipse(ptmat2);
             Size size = rot.boundingRect().size();
-            if(checkEllipse(size,rot)){
-                Imgproc.circle(origin, rot.center, 5, color, -1);
+            if(mode >1) {
+                if (checkEllipse(size, rot)) {
+                    Imgproc.circle(origin, rot.center, 5, color, -1);
+                    color = new Scalar(0, 255, 0);
+                    Imgproc.ellipse(origin, rot, color, 2);
+                }
+            }
+            else{
+                Imgproc.circle(img, rot.center, 5, color, -1);
                 color = new Scalar(0, 255, 0);
-                Imgproc.ellipse(origin, rot, color, 2);
+                Imgproc.ellipse(img, rot, color, 2);
+                origin = img;
             }
         }
     }
@@ -87,10 +102,10 @@ public class DetectManhole {
         int thre1 = (((int)rot.center.x /50) -6)*1000;
         int thre2 = (((int)rot.center.x / 50) - 6) * 5000;
         Log.d(TAG, "area=" + String.valueOf(size.area()) +
-                   "\ncenter=" + String.valueOf(rot.center)  +
-                   "\nthre" + String.valueOf(thre1) + String.valueOf(thre2) +
-                   "\nxy" + String.valueOf(size.width) + " " + String.valueOf(size.height) +
-                   "\nangle" + String.valueOf(rot.angle));
+                "\ncenter=" + String.valueOf(rot.center) +
+                "\nthre" + String.valueOf(thre1) + String.valueOf(thre2) +
+                "\nxy" + String.valueOf(size.width) + " " + String.valueOf(size.height) +
+                "\nangle" + String.valueOf(rot.angle));
 //        return (size.height - size.width>100 && size.height - size.width<200 && size.area()<20000);
         return ((rot.angle <= 10 || (rot.angle <=180 && rot.angle >=170)) && size.height>size.width);
     }

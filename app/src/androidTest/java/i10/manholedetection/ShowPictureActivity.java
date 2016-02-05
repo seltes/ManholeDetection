@@ -71,7 +71,7 @@ public class ShowPictureActivity extends Activity {
                 Utils.bitmapToMat(changeImg, cvImg);
                 Imgproc.cvtColor(cvImg, cvImg, Imgproc.COLOR_RGB2GRAY);
                 //マンホール処理
-                detectManhole=new DetectManhole(cvImg,originImg);
+                detectManhole=new DetectManhole(cvImg,originImg,0);
                 changeImg = Bitmap.createBitmap(detectManhole.origin.cols(), detectManhole.origin.rows(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(detectManhole.origin,changeImg);
                 //画像出力

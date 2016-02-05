@@ -17,7 +17,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-public class OpencvCameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class EllipseActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final String TAG = "OCVSample::Activity";
     //カメラビューインスタンス
@@ -95,7 +95,7 @@ public class OpencvCameraActivity extends Activity implements CameraBridgeViewBa
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        detectManhole=new DetectManhole(inputFrame.gray(),inputFrame.rgba(),2);
+        detectManhole=new DetectManhole(inputFrame.gray(),inputFrame.rgba(),1);
         return detectManhole.origin;
     }
 }

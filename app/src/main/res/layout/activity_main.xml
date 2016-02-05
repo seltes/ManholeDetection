@@ -32,5 +32,17 @@ tools:context=".MainActivity"
         android:text="OpenCVCam"
         android:id="@+id/cvButton"
         android:layout_gravity="center_horizontal" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="EdgeCam"
+        android:id="@+id/edgeButton"
+        android:layout_gravity="center_horizontal" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="EllipseCam"
+        android:id="@+id/ellipseButton"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
