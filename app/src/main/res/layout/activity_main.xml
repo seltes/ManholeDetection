@@ -6,43 +6,84 @@ android:layout_height="match_parent"
     android:gravity="center"
 android:background="#aaffaa"
 tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="1">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cam Preview"
-        android:id="@+id/camButton" />
+        android:id="@+id/camButton"
+        android:layout_gravity="center_horizontal" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.09"></LinearLayout>
 
     <ImageView
     android:id="@+id/image_view"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
 
-    <Button
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pic Preview"
-        android:id="@+id/picButton"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal">
 
-    <Button
-        android:layout_width="wrap_content"
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pic Preview"
+            android:id="@+id/picButton"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pic Edge"
+            android:id="@+id/picEdgeButton"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pic Ellipse"
+            android:id="@+id/picEllipseButton" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="OpenCVCam"
-        android:id="@+id/cvButton"
-        android:layout_gravity="center_horizontal" />
-    <Button
+        android:layout_gravity="right"
+        android:layout_weight="0.10"></LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="EdgeCam"
-        android:id="@+id/edgeButton"
-        android:layout_gravity="center_horizontal" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="EllipseCam"
-        android:id="@+id/ellipseButton"
-        android:layout_gravity="center_horizontal" />
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OpenCVCam"
+            android:id="@+id/cvButton" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EdgeCam"
+            android:id="@+id/edgeButton" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EllipseCam"
+            android:id="@+id/ellipseButton" />
+    </LinearLayout>
 
 </LinearLayout>

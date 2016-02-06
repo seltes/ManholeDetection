@@ -3,7 +3,6 @@ package i10.manholedetection;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -11,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -22,19 +20,16 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class ShowPictureActivity extends Activity {
+public class PicEllipseActivity extends Activity {
     private static final int REQUEST_GALLERY = 0;
     private ImageView imgView;
-    Context cont;
     Bitmap changeImg;
     //処理結果
     Mat cvImg;
@@ -60,11 +55,10 @@ public class ShowPictureActivity extends Activity {
         setContentView(R.layout.img_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         imgView = (ImageView) findViewById(R.id.image_view);
-        cvImg = new Mat(height, width, CvType.CV_8U);
-        originImg = new Mat(height, width, CvType.CV_8U);
+        cvImg = new Mat(height,width, CvType.CV_8U);
+        originImg = new Mat(height,width, CvType.CV_8U);
         Button saveButton = (Button) findViewById(R.id.picSaveButton);
         saveButton.setOnClickListener(saveButton_Click);
-        cont = this;
         // ギャラリー呼び出し
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -81,7 +75,7 @@ public class ShowPictureActivity extends Activity {
                 assert in != null;
                 in.close();
                 changeImg = Bitmap.createScaledBitmap(getImg, width, height, false);
-                Utils.bitmapToMat(changeImg, originImg);
+                Utils.bitmapToMat(changeImg,originImg);
                 //C言語での処理
 //                changeImg.getPixels(pixels, 0, width, 0, 0, width, height);
 //                filter(pixels, width, height, cnt);
@@ -91,9 +85,9 @@ public class ShowPictureActivity extends Activity {
                 Utils.bitmapToMat(changeImg, cvImg);
                 Imgproc.cvtColor(cvImg, cvImg, Imgproc.COLOR_RGB2GRAY);
                 //マンホール処理
-                detectManhole = new DetectManhole(cvImg, originImg, 2);
+                detectManhole=new DetectManhole(cvImg,originImg,1);
                 changeImg = Bitmap.createBitmap(detectManhole.origin.cols(), detectManhole.origin.rows(), Bitmap.Config.ARGB_8888);
-                Utils.matToBitmap(detectManhole.origin, changeImg);
+                Utils.matToBitmap(detectManhole.origin,changeImg);
                 //画像出力
                 imgView.setImageBitmap(changeImg);
             } catch (Exception e) {
@@ -101,6 +95,8 @@ public class ShowPictureActivity extends Activity {
             }
         }
     }
+
+
 
     private View.OnClickListener saveButton_Click = new View.OnClickListener() {
         @Override
@@ -135,7 +131,7 @@ public class ShowPictureActivity extends Activity {
         // アンドロイドのデータベースへ登録
         // (登録しないとギャラリーなどにすぐに反映されないため)
         ContentValues values = new ContentValues();
-        ContentResolver contentResolver = ShowPictureActivity.this.getContentResolver();
+        ContentResolver contentResolver = PicEllipseActivity.this.getContentResolver();
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
         values.put("_data", path);
         contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
