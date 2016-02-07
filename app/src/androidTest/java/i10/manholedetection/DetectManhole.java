@@ -19,6 +19,8 @@ import org.opencv.utils.Converters;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.opencv.imgproc.Imgproc.MORPH_CLOSE;
+import static org.opencv.imgproc.Imgproc.MORPH_OPEN;
 import static org.opencv.imgproc.Imgproc.fitEllipse;
 
 /**
@@ -27,6 +29,9 @@ import static org.opencv.imgproc.Imgproc.fitEllipse;
 public class DetectManhole {
     public Mat img;
     public Mat origin;
+    private Mat filterMat = new Mat();
+    private Point point = new Point(-1,-1);
+    private int rep = 3;
     public int mode;
     private String TAG = "DetectManhole";
 
@@ -41,8 +46,10 @@ public class DetectManhole {
         if(mode >0) {
 //      Cannyフィルタ
             Imgproc.Canny(img, img, 10, 60);
-//      膨張
-            Imgproc.dilate(img, img, new Mat());
+//      クロージング処理
+//            Imgproc.morphologyEx(img, origin, MORPH_CLOSE, filterMat,point, rep);
+            Imgproc.dilate(img,img,filterMat,point,rep);
+            Imgproc.erode(img, img, filterMat, point, rep - 2);
             if(mode <2){
                 origin =img;
             }
@@ -51,9 +58,11 @@ public class DetectManhole {
         else{
 //      Cannyフィルタ
             Imgproc.Canny(img, img, 10, 60);
-//      膨張
-            Imgproc.dilate(img, origin, new Mat());
-        }
+//      クロージング処理
+//            Imgproc.morphologyEx(img, origin, MORPH_CLOSE, filterMat,point, rep);
+            Imgproc.dilate(img, img, filterMat, point, rep);
+            Imgproc.erode(img, origin, filterMat, point, rep - 2);
+       }
 //       origin = img;
     }
 
@@ -107,7 +116,7 @@ public class DetectManhole {
                 "\nxy" + String.valueOf(size.width) + " " + String.valueOf(size.height) +
                 "\nangle" + String.valueOf(rot.angle));
 //        return (size.height - size.width>100 && size.height - size.width<200 && size.area()<20000);
-        return ((rot.angle <= 10 || (rot.angle <=180 && rot.angle >=170)) && size.height>size.width);
+        return ((rot.angle <= 10 || (rot.angle <=180 && rot.angle >=170)) && size.height>size.width && size.height < img.size().height*3/4);
     }
 }
 
